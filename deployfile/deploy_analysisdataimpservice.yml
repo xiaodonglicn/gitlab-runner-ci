@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: analysisdataimpservice
+  name: analysisdataimpservice
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analysisdataimpservice
+  template:
+    metadata:
+      labels:
+        app: analysisdataimpservice
+    spec:
+      containers:
+       -  image: APP_IMAGE
+          imagePullPolicy: IfNotPresent
+          name: analysisdataimpservice
+          ports:
+            - containerPort: 8110
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: analysisdataimpservice
+  name: analysisdataimpservice
+  #namespace: NAMESPACE
+spec:
+  ports:
+    - port: 8110
+      protocol: TCP
+      targetPort: 8110
+  selector:
+    app: analysisdataimpservice
+  sessionAffinity: None
+  type: NodePort

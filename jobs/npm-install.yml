@@ -1,0 +1,11 @@
+.install:
+  stage: install
+  tags:
+    - vue 
+  script:
+    - printenv
+    - $INSTALL_SHELL
+    - tar cf node_modules.tar.gz node_modules 
+    - cp node_modules.tar.gz $OLDPWD
+   
+

@@ -1,0 +1,56 @@
+include:
+  - project: "ci-devops/gitlabci-service"
+    ref: main
+    file: "jobs/vue_build.yml"
+  - project: "ci-devops/gitlabci-service"
+    ref: main
+    file: "jobs/npm-install.yml"
+  - project: "ci-devops/gitlabci-service"
+    ref: main
+    file: "jobs/dingTalk.yml"
+
+variables:
+  TIMESTAMP: 'date -d $CI_COMMIT_TIMESTAMP +%Y%m%d%H%M'
+  #打包阶段执行的命令
+  BUILD_SHELL: "yarn  build"
+  #初始化阶段执行的命令
+  INSTALL_SHELL: "yarn  install"
+  #缓存产物目录
+  #CACHE_DIR: "dist/" 
+  #上传制品库
+  ARTIFACT_REPOSITORY_NAME: "ci-vue"
+  TARGET_FILE_PATH: "$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA-$CI_PIPELINE_ID"
+  TARGET_ARTIFACT_NAME: "$CI_PROJECT_NAME-$CI_COMMIT_REF_NAME"
+
+
+stages:
+  - install
+  - build
+  - build_image
+  - deploy_app
+  - dingTalk
+
+install:
+
+  rules:
+    - changes:
+        - ./package.json
+        - ./package-lock.json
+  stage: install
+  extends: .install
+
+build:
+  stage: build
+  extends: .build
+
+build_image:
+  stage: build_image
+  extends: .build_image
+
+deploy_app:
+  stage: deploy_app
+  extends: .deploy_app
+
+dingTalk:
+ stage: dingTalk
+ extends: .dingTalk

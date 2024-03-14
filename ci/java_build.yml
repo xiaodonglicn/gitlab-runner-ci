@@ -1,0 +1,109 @@
+.demo:
+  stage: build_image
+  tags:
+    # 指定runner
+    - test
+  rules:
+    # 指定分支
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - demo/**/*
+  script:
+    - |
+    - echo "====================进入demo======================="
+    - echo "========定义变量:$CI_JOB_NAME========="
+    #打印所有的环境变量，用于调试
+    - env
+    - echo "====================编译======================="
+    - java -version
+    - mvn -version
+    # 如果是多层目录，需要进入当前项目所在目录
+    - cd demo/
+#    - mvn clean
+#    - mvn compile
+    - echo "====================开始打包======================="
+    - $BUILD_SHELL
+    - echo "====================打包完毕======================="
+    - cd target/
+    - ls
+    - pwd
+    - echo "=================================================="
+    # 退出到根目录
+    - cd ..
+    - cd ..
+    - ls
+    # 拉取Dockerfile文件，用于docker build
+    - wget -O  Dockerfile http://192.168.6.246:70/ci-devops/gitlabci-service/-/raw/main/buildfile/demo.Dockerfile
+    # 打印Dockerfile
+    - ls && cat Dockerfile
+    # 构建镜像
+    - docker build . -t $HARBOR_URL/demo/$CI_JOB_NAME:$($TIMESTAMP)
+    # 推送镜像至仓库
+    - docker push $HARBOR_URL/demo/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/demo/$CI_JOB_NAME:$($TIMESTAMP)
+    - IMAGES=$HARBOR_URL/demo/$CI_JOB_NAME:$($TIMESTAMP)
+    - echo $IMAGES
+    # 拉去deploy.yml，用于执行k8s相关命令
+    - wget -O deploy.yml http://192.168.6.246:70/ci-devops/gitlabci-service/-/raw/main/deployfile/deploy_demo.yml
+    - ls
+    # 替换变量
+#    - sed -i "s@APP_PORT@8080@g" deploy.yml
+#    - sed -i "s@APP_NAME@$CI_PROJECT_NAME@g" deploy.yml
+#    - sed -i "s@NAMESPACE@default@g" deploy.yml
+    - sed -i "s@APP_IMAGE@$IMAGES@g" deploy.yml
+    - cat deploy.yml
+    # 暂时关闭
+    - kubectl apply -f deploy.yml
+
+.demo2:
+  stage: build_image
+  tags: 
+    - test
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - demo2/**/*
+  script:
+    - |
+    - echo "====================进入demo2======================="
+    - echo "========定义变量:$CI_JOB_NAME========="
+    #打印所有的环境变量，用于调试
+#    - env
+    - echo "====================编译======================="
+    - java -version
+    - mvn -version
+    # 如果是多层目录，需要进入当前项目所在目录
+    - cd demo2/
+    - echo "====================开始打包======================="
+    - $BUILD_SHELL
+    - echo "====================打包完毕======================="
+    - cd target/
+    - ls
+    - pwd
+    - echo "=================================================="
+    # 退出到根目录
+    - cd ..
+    - cd ..
+    - ls
+    # 拉去Dockerfile文件，用于docker build
+    - wget -O  Dockerfile http://192.168.6.246:70/ci-devops/gitlabci-service/-/raw/main/buildfile/demo2.Dockerfile
+    # 打印Dockerfile
+    - ls && cat Dockerfile
+    # 构建镜像
+    - docker build . -t $HARBOR_URL/demo/$CI_JOB_NAME:$($TIMESTAMP)
+    # 推送镜像至仓库
+    - docker push $HARBOR_URL/demo/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/demo/$CI_JOB_NAME:$($TIMESTAMP)
+    - IMAGES=$HARBOR_URL/demo/$CI_JOB_NAME:$($TIMESTAMP)
+    - echo $IMAGES
+    # 拉去deploy.yml，用于执行k8s相关命令
+    - wget -O deploy.yml http://192.168.6.246:70/ci-devops/gitlabci-service/-/raw/main/deployfile/deploy_demo2.yml
+    - ls
+    # 替换变量
+#    - sed -i "s@APP_PORT@8090@g" deploy.yml
+#    - sed -i "s@APP_NAME@$CI_PROJECT_NAME@g" deploy.yml
+#    - sed -i "s@NAMESPACE@default@g" deploy.yml
+    - sed -i "s@APP_IMAGE@$IMAGES@g" deploy.yml
+    - cat deploy.yml
+    # 暂时关闭
+    - kubectl apply -f deploy.yml

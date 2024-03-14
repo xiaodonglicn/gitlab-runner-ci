@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: auto-deploy-demo
+  name: auto-deploy-demo
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auto-deploy-demo
+  template:
+    metadata:
+      labels:
+        app: auto-deploy-demo
+    spec:
+      containers:
+       -  image: APP_IMAGE
+          imagePullPolicy: IfNotPresent
+          name: auto-deploy-demo
+          ports:
+            - containerPort: 8898
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: auto-deploy-demo
+  name: auto-deploy-demo
+  #namespace: NAMESPACE
+spec:
+  ports:
+    - port: 8898
+      protocol: TCP
+      targetPort: 8898
+  selector:
+    app: auto-deploy-demo
+  sessionAffinity: None
+  type: NodePort

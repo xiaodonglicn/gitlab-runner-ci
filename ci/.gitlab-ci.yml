@@ -1,0 +1,32 @@
+include:
+  - project: "ci-devops/gitlabci-service"
+    ref: main
+    file: "ci/java_build.yml"
+  - project: "ci-devops/gitlabci-service"
+    ref: main
+    file: "ci/dingTalk_ci.yml"
+
+variables:
+  TIMESTAMP: 'date -d $CI_COMMIT_TIMESTAMP +%Y%m%d%H%M'
+  BUILD_SHELL: "mvn clean package -T 2C -Dmaven.test.skip=true -Dmaven.compile.fork=true"
+
+  ARTIFACT_REPOSITORY_NAME: "java"
+  TARGET_FILE_PATH: "$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA-$CI_PIPELINE_ID"
+  TARGET_ARTIFACT_NAME: "$CI_PROJECT_NAME-$CI_COMMIT_REF_NAME"
+  #IMAGE_TAG: "$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:`$TIMESTAMP`"
+
+stages:
+  - build_image
+  - dingTalk
+
+demo:
+  stage: build_image
+  extends: .demo
+
+demo2:
+  stage: build_image
+  extends: .demo2
+
+#dingTalk:
+#  stage: dingTalk
+#  extends: .dingTalk

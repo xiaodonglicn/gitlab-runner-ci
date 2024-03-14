@@ -1,0 +1,27 @@
+include:
+  - project: "ci-devops/gitlabci-service"
+    ref: main
+    file: "jobs/dingTalk.yml"
+
+variables:
+  TIMESTAMP: 'date -d $CI_COMMIT_TIMESTAMP +%Y%m%d%H%M'
+stages:
+  - dingTalk
+
+dingTalk:
+  cache:
+    paths: []
+  stage: dingTalk
+  tags:
+    - vue 
+  script:
+      - echo $TIMESTAMP
+      - IMAGES=$HARBOR_URL/$CI_PROJECT_NAME/nginx:$($TIMESTAMP)
+      - echo $IMAGES
+      - wget -O deploy.yml http://192.168.6.246:70/ci-devops/gitlabci-service/-/raw/main/deployfile/deploy.yml
+      - ls
+      - sed -i "s@APP_PORT@80@g" deploy.yml
+      - sed -i "s@APP_NAME@$CI_PROJECT_NAME@g" deploy.yml
+      - sed -i "s@NAMESPACE@default@g" deploy.yml
+      - sed -i "s@APP_IMAGE@$IMAGES@g" deploy.yml
+      - cat deploy.yml

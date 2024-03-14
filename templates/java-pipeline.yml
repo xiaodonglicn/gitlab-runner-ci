@@ -1,0 +1,82 @@
+include:
+  - project: "ci-devops/gitlabci-service"
+    ref: main
+    file: "jobs/java_build.yml"
+  - project: "ci-devops/gitlabci-service"
+    ref: main
+    file: "jobs/dingTalk.yml"
+
+variables:
+  TIMESTAMP: 'date -d $CI_COMMIT_TIMESTAMP +%Y%m%d%H%M'
+  BUILD_SHELL: "mvn clean package -T 2C -Dmaven.test.skip=true -Dmaven.compile.fork=true"
+
+  ARTIFACT_REPOSITORY_NAME: "java"
+  TARGET_FILE_PATH: "$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA-$CI_PIPELINE_ID"
+  TARGET_ARTIFACT_NAME: "$CI_PROJECT_NAME-$CI_COMMIT_REF_NAME"
+  #IMAGE_TAG: "$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:`$TIMESTAMP`"
+
+
+stages:
+  - build_jar
+  - build_image
+  - dingTalk
+
+build:
+  stage: build_jar
+  extends: .build
+
+validservice:
+  stage: build_image
+  extends: .validservice
+
+analysisdataimpservice:
+  stage: build_image
+  extends: .analysisdataimpservice
+
+attranalysisservice:
+  stage: build_image
+  extends: .attranalysisservice
+
+complex-enquiries-service:
+  stage: build_image
+  extends: .complex-enquiries-service
+
+datacommittanceservice:
+  stage: build_image
+  extends: .datacommittanceservice
+
+dataimportservice:
+  stage: build_image
+  extends: .dataimportservice
+
+datasyncservice:
+  stage: build_image
+  extends: .datasyncservice
+
+masterdataservice:
+  stage: build_image
+  extends: .masterdataservice
+
+mpservice:
+  stage: build_image
+  extends: .mpservice
+
+objanalysisservice:
+  stage: build_image
+  extends: .objanalysisservice
+
+objrelationsrv:
+  stage: build_image
+  extends: .objrelationsrv
+
+thirdparty-service-integration:
+  stage: build_image
+  extends: .thirdparty-service-integration
+
+adminservice:
+  stage: build_image
+  extends: .adminservice
+
+dingTalk:
+  stage: dingTalk
+  extends: .dingTalk

@@ -1,0 +1,276 @@
+.build:
+  stage: build_jar
+  tags:
+    - maven
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+
+  script:
+    - |
+      $BUILD_SHELL
+      for i in `ls -l | grep ^d | awk '{print $NF}'`
+      do 
+       curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -T $i/target/*.jar "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/$i.jar"
+      done
+
+
+.validservice:
+  stage: build_image
+  tags: 
+    - maven 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - validservice/**
+  script:
+    - printenv
+    - cd $CI_JOB_NAME
+    - echo "curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O ${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - ls -l
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - sed -i "s@IMAGE@$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)@" deploy.yml
+    - kubectl apply -f deploy.yml
+
+.adminservice:
+  stage: build_image
+  tags: 
+    - maven 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - adminservice/**
+  script:
+    - printenv
+    - cd $CI_JOB_NAME
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - ls
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - sed -i "s@IMAGE@$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)@" deploy.yml
+    - kubectl apply -f deploy.yml
+
+.analysisdataimpservice:
+  stage: build_image
+  tags: 
+    - maven 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - analysisdataimpservice/**
+  script:
+    - printenv
+    - cd $CI_JOB_NAME
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - ls
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - sed -i "s@IMAGE@$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)@" deploy.yml
+    - kubectl apply -f deploy.yml
+
+.attranalysisservice:
+  stage: build_image
+  tags: 
+    - maven 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - attranalysisservice/**
+  script:
+    - printenv
+    - cd $CI_JOB_NAME
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - ls
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - sed -i "s@IMAGE@$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)@" deploy.yml
+    - kubectl apply -f deploy.yml
+
+.complex-enquiries-service:
+  stage: build_image
+  tags: 
+    - maven 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - complex-enquiries-service/**
+  script:
+    - printenv
+    - cd $CI_JOB_NAME
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - ls
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - sed -i "s@IMAGE@$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)@" deploy.yml
+    - kubectl apply -f deploy.yml
+
+.datacommittanceservice:
+  stage: build_image
+  tags: 
+    - maven 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - datacommittanceservice/**
+  script:
+    - printenv
+    - cd $CI_JOB_NAME
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - ls
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - sed -i "s@IMAGE@$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)@" deploy.yml
+    - kubectl apply -f deploy.yml
+
+.dataimportservice:
+  stage: build_image
+  tags: 
+    - maven 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - dataimportservice/**
+  script:
+    - printenv
+    - cd $CI_JOB_NAME
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - ls
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - sed -i "s@IMAGE@$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)@" deploy.yml
+    - kubectl apply -f deploy.yml
+
+.datasyncservice:
+  stage: build_image
+  tags: 
+    - maven 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - datasyncservice/**
+  script:
+    - printenv
+    - cd $CI_JOB_NAME
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - ls
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - sed -i "s@IMAGE@$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)@" deploy.yml
+    - kubectl apply -f deploy.yml
+
+.masterdataservice:
+  stage: build_image
+  tags: 
+    - maven 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - masterdataservice/**
+  script:
+    - printenv
+    - cd $CI_JOB_NAME
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - ls
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - sed -i "s@IMAGE@$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)@" deploy.yml
+    - kubectl apply -f deploy.yml
+
+.mpservice:
+  stage: build_image
+  tags: 
+    - maven 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - mpservicev2/**
+  script:
+    - printenv
+    - cd $CI_JOB_NAME
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - ls
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - sed -i "s@IMAGE@$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)@" deploy.yml
+    - kubectl apply -f deploy.yml
+
+.objanalysisservice:
+  stage: build_image
+  tags: 
+    - maven 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - objanalysisservice/**
+  script:
+    - printenv
+    - cd $CI_JOB_NAME
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - ls
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - sed -i "s@IMAGE@$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)@" deploy.yml
+    - kubectl apply -f deploy.yml
+
+.objrelationsrv:
+  stage: build_image
+  tags: 
+    - maven 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - objrelationsrv-v2/**
+  script:
+    - printenv
+    - cd $CI_JOB_NAME
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - ls
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - sed -i "s@IMAGE@$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)@" deploy.yml
+    - kubectl apply -f deploy.yml
+
+.thirdparty-service-integration:
+  stage: build_image
+  tags: 
+    - maven 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - thirdparty-service-integration/**
+  script:
+    - printenv
+    - cd $CI_JOB_NAME
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/${CI_JOB_NAME}.jar"
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - ls
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)
+    - sed -i "s@IMAGE@$HARBOR_URL/$CI_PROJECT_NAME/$CI_JOB_NAME:$($TIMESTAMP)@" deploy.yml
+    - kubectl apply -f deploy.yml

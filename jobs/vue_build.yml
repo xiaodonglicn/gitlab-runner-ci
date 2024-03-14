@@ -1,0 +1,50 @@
+.build:
+  cache:
+    paths: []
+  stage: build
+  tags:
+    - vue
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master-dev"'
+
+  script:
+    - printenv
+    - tar xf $OLDPWD/node_modules.tar.gz -C  $CI_PROJECT_DIR/
+    - $BUILD_SHELL
+    - tar cf dist.tar.gz dist
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -T dist.tar.gz "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/dist.tar.gz"
+
+.build_image:
+  cache:
+    paths: []
+  stage: build_image
+  tags: 
+    - vue 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master-dev"'
+
+  script:
+    - echo ${HARBOR_PASSWORD} | docker login ${HARBOR_URL} --username ${HARBOR_USER} --password-stdin
+    - curl -u${ARTIFACT_USER}:${ARTIFACT_PASSWORD} -L -O "${ARTIFACT_URL}/${ARTIFACT_REPOSITORY_NAME}/${TARGET_FILE_PATH}/${TARGET_ARTIFACT_NAME}-$($TIMESTAMP)/dist.tar.gz"
+    - wget -O  Dockerfile http://192.168.6.246:70/ci-devops/gitlabci-service/-/raw/main/buildfile/nginx.Dockerfile
+    - tar xf dist.tar.gz
+    - docker build . -t $HARBOR_URL/$CI_PROJECT_NAME/nginx:$($TIMESTAMP)
+    - docker push $HARBOR_URL/$CI_PROJECT_NAME/nginx:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/$CI_PROJECT_NAME/nginx:$($TIMESTAMP)
+
+.deploy_app:
+  cache:
+    paths: []
+  stage: deploy_app
+  tags:
+    - vue 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master-dev"'
+
+  script:
+    - IMAGES=$($HARBOR_URL/$CI_PROJECT_NAME/nginx:$($TIMESTAMP))
+    - wget -O deploy.yml http://192.168.6.246:70/ci-devops/gitlabci-service/-/raw/main/deployfile/deploy.yml
+    - sed -i "s@APP_IMAGE@$IMAGES@g" deploy.yml
+    - cat deploy.yml
+    #- echo ${HARBOR_PASSWORD} | docker login $HARBOR_URL/$CI_PROJECT_NAME --username ${HARBOR_USER} --password-stdin
+    #- kk -n dev-second set image deployment/nginx nginx=$HARBOR_URL/$CI_PROJECT_NAME/nginx:$($TIMESTAMP)

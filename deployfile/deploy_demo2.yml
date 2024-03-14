@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: demo2
+  name: demo2
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo2
+  template:
+    metadata:
+      labels:
+        app: demo2
+    spec:
+      containers:
+       -  image: APP_IMAGE
+          imagePullPolicy: IfNotPresent
+          name: demo2
+          ports:
+            - containerPort: 8090
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: demo2
+  name: demo2
+  #namespace: NAMESPACE
+spec:
+  ports:
+    - port: 8090
+      protocol: TCP
+      targetPort: 8090
+  selector:
+    app: demo2
+  sessionAffinity: None
+  type: NodePort

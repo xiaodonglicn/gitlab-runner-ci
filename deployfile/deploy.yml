@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: APP_NAME
+  name: APP_NAME
+  namespace: NAMESPACE
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: APP_NAME
+  template:
+    metadata:
+      labels:
+        app: APP_NAME
+    spec:
+      containers:
+       -  image: APP_IMAGE
+          imagePullPolicy: IfNotPresent
+          name: APP_NAME
+          ports:
+            - containerPort: APP_PORT
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: APP_NAME
+  name: APP_NAME
+  #namespace: NAMESPACE
+spec:
+  ports:
+    - port: APP_PORT
+      protocol: TCP
+      targetPort: APP_PORT
+  selector:
+    app: APP_NAME
+  sessionAffinity: None
+  type: NodePort

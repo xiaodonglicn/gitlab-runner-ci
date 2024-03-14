@@ -1,0 +1,53 @@
+.data-platform-common-template:
+  stage: build_image
+  tags:
+    # 指定runner
+    - server
+  rules:
+    # 指定分支
+    - if: '$CI_COMMIT_REF_NAME == "dev/auto-deploy"'
+      changes:
+        - $CI_JOB_NAME/**/*
+  script:
+    - |
+    - echo "====================进入$CI_BUILD_NAME======================="
+    - echo "========定义变量:$CI_JOB_NAME========="
+    #打印所有的环境变量，用于调试
+    - env
+    - echo "====================编译======================="
+    - java -version
+    - mvn -version
+    # 如果是多层目录，需要进入当前项目所在目录
+    - cd $CI_JOB_NAME/
+    #    - mvn clean
+    #    - mvn compile
+    - echo "====================开始打包======================="
+    - $BUILD_SHELL
+    - echo "====================打包完毕======================="
+    - cd target/
+    - ls
+    - pwd
+    - echo "=================================================="
+    # 退出到根目录
+    - cd ..
+    - cd ..
+    - ls
+    # 拉取Dockerfile文件，用于docker build
+    - wget -O  Dockerfile http://192.168.6.246:70/ci-devops/gitlabci-service/-/raw/main/buildfile/$CI_JOB_NAME.Dockerfile
+    # 打印Dockerfile
+    - ls && cat Dockerfile
+    # 构建镜像
+    - docker build . -t $HARBOR_URL/demo/$CI_JOB_NAME:$($TIMESTAMP)
+    # 推送镜像至仓库
+    - docker push $HARBOR_URL/demo/$CI_JOB_NAME:$($TIMESTAMP)
+    - docker rmi  $HARBOR_URL/demo/$CI_JOB_NAME:$($TIMESTAMP)
+    - IMAGES=$HARBOR_URL/demo/$CI_JOB_NAME:$($TIMESTAMP)
+    - echo $IMAGES
+    # 拉去deploy.yml，用于执行k8s相关命令
+    - wget -O deploy.yml http://192.168.6.246:70/ci-devops/gitlabci-service/-/raw/main/deployfile/deploy_$CI_JOB_NAME.yml
+    - ls
+    # 替换变量
+    - sed -i "s@APP_IMAGE@$IMAGES@g" deploy.yml
+    - cat deploy.yml
+    # 暂时关闭
+    - kubectl apply -f deploy.yml

@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: adminservice
+  name: adminservice
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adminservice
+  template:
+    metadata:
+      labels:
+        app: adminservice
+    spec:
+      containers:
+       -  image: APP_IMAGE
+          imagePullPolicy: IfNotPresent
+          name: adminservice
+          ports:
+            - containerPort: 8098
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: adminservice
+  name: adminservice
+  #namespace: NAMESPACE
+spec:
+  ports:
+    - port: 8098
+      protocol: TCP
+      targetPort: 8098
+  selector:
+    app: adminservice
+  sessionAffinity: None
+  type: NodePort

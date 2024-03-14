@@ -1,0 +1,31 @@
+.dingTalk:
+  cache:
+    paths: []
+  stage: dingTalk
+  tags:
+    - vue 
+  script:
+    - |
+      NOW_TIME=$($TIMESTAMP)
+  
+       curl -X POST "https://oapi.dingtalk.com/robot/send?access_token=326db63e64caab3640a99d349b8eeb3487b23af690891e3cf1eea9a6dc428d4d" \
+                    -H "Content-Type: application/json" \
+                    -d "{
+                           \"actionCard\": {
+                           \"title\": \"自动发布完成\", 
+                           \"text\": \"<font color=#228B22 size=4>${project_name}构建部署完成</font>\n- 项目名称: ${CI_PROJECT_NAME}\n- 提交分支: ${CI_COMMIT_BRANCH}\n- 构建用户: ${GITLAB_USER_LOGIN}\n- 构建时间: ${NOW_TIME}\n- 提交信息: ${CI_COMMIT_MESSAGE}\", 
+                           \"hideAvatar\": \"0\", 
+                           \"btnOrientation\": \"0\", 
+                           \"btns\": [
+                               {
+                                 \"title\": \"k8s管理地址\", 
+                                 \"actionURL\": \"dingtalk://dingtalkclient/page/link?url=${K8S_URL}&pc_slide=false\"
+                               }, 
+                               {
+                                \"title\": \"30061环境地址\", 
+                                \"actionURL\": \"dingtalk://dingtalkclient/page/link?url=${ENV_30061}&pc_slide=false\"
+                               }
+                            ]
+                        }, 
+                          \"msgtype\": \"actionCard\"
+                    }"
